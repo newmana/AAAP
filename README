@@ -6,6 +6,65 @@ http://www.devbridge.com/projects/autocomplete/
 
 This adds some new functionality and removes some bugs.
 
+How to Use
+==========
+
+The files used are:
+style.css - the css styling.
+shadow.png - used for the drop shadow effect.
+autocomplate.js - the library.
+
+Put the following into your HTML file (requires prototype) or add to
+existing CSS and Javascript files:
+<link rel="stylesheet" type="text/css" href="style.css"/>
+<script type="text/javascript" src="autocomplete.js"></script>
+
+Add to you Event observer:
+Event.observe(window, 'load', function() {
+  ...
+  new Autocomplete("query", { 
+    serviceUrl : "/object"
+  ...
+});
+
+Add a form input tag:
+<input type="text" name="wunderbar" id="query"/>
+
+If you type "whateveryoutype" into the text bar then it will send a GET
+request: 
+/object?query=whateveryoutype
+
+The server responds to the GET request with the following JSON:
+{
+  query:'whateveryoutype',
+  suggestions: ['a', 'b', 'c'],
+  data: ['A', 'B', 'C']
+}
+
+Query - the query that was requested.
+Suggestions - the results from the query (a, b, and c).
+Data (optional) - values for callback function when data is selected.
+
+Options when constructing Autocomplete:
+* serverUrl - a URL to send the GET query to.
+* onSelect - a function that will be called when a value a value is
+ selected from the drop down (returned by the query).
+* onNoResults - a function that is called when the query returns without any
+ results.  Useful if you want to display that no results were found.
+* onKeypressed - a function that is called when the user modified the text
+ box.  Useful if you want to clear error messages.
+* maxHeight - the maximum number of pixels high that the drop down box will
+ be.
+* width - the number of pixels wide the drop down box will be.
+* autoSubmit - set to true to submit the value without requiring the user 
+ to hit enter or TAB.
+* minChars - the number of characters to wait for the user to type before
+ (re-)submitting the query.
+* deferRequestBy - the number of milliseconds to wait before submitting the
+ query.
+* container - the name of the DIV that the box is in (if you want to inherit
+ styles, etc).
+
 Changes
 =======
 

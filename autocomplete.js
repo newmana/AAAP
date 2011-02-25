@@ -1,5 +1,4 @@
 /*
- *
  *  AAAP Version 1.0
  *  (c) 2010 Tomas Kirda
  *  (c) 2011 Andrew Newman
