@@ -1,0 +1,18 @@
+Andrew's Ajax AutoComplete for Prototype (AAAP)
+===============================================
+
+This is an update/fork of:
+http://www.devbridge.com/projects/autocomplete/
+
+This adds some new functionality and removes some bugs.
+
+Changes
+=======
+
+Version 1.0
+-----------
+* Adds method onNoResults (when the AJAX query returns no results).
+* Adds method onKeypressed (when user types something in to the text box).
+* Doesn't allow submission (on Enter or TAB) if there are no results
+ returned by the initial query.
+
