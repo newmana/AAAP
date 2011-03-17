@@ -42,8 +42,10 @@ The server responds to the GET request with the following JSON:
 }
 
 Query - the query that was requested.
-Suggestions - the results from the query (a, b, and c).
-Data (optional) - values for callback function when data is selected.
+Suggestions - the results to display from the query (a, b, and c).
+Data (optional) - values that are not visible but can be used to refer to 
+the visible results - like an ID - used in callback function when the 
+result is selected.
 
 Options when constructing Autocomplete:
 * serverUrl - a URL to send the GET query to.
