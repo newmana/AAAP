@@ -19,7 +19,7 @@ existing CSS and Javascript files:
 <link rel="stylesheet" type="text/css" href="style.css"/>
 <script type="text/javascript" src="autocomplete.js"></script>
 
-Add to you Event observer:
+Add to your Event observer:
 Event.observe(window, 'load', function() {
   ...
   new Autocomplete("query", { 
