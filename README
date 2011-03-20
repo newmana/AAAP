@@ -49,6 +49,8 @@ result is selected.
 
 Options when constructing Autocomplete:
 * serverUrl - a URL to send the GET query to.
+* parameters - allows named parameters or functions (to be executed each
+ time) to be added to the Ajax request.
 * onSelect - a function that will be called when a value a value is
  selected from the drop down (returned by the query).
 * onNoResults - a function that is called when the query returns without any
@@ -66,6 +68,21 @@ Options when constructing Autocomplete:
  query.
 * container - the name of the DIV that the box is in (if you want to inherit
  styles, etc).
+
+Examples
+========
+To send an additional parameter and execute a function each time a request is sent:
+new Autocomplete("query", {
+  serviceUrl : "/object",
+  parameters : {
+    something : "foo",
+    func : doStuff
+  }
+});
+
+function doStuff() {
+  ...
+}
 
 Changes
 =======
