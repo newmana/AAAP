@@ -24,6 +24,7 @@ var Autocomplete = function(el, options){
   this.onChangeInterval = null;
   this.ignoreValueChange = false;
   this.serviceUrl = options.serviceUrl;
+  this.parameters = options.parameters;
   this.options = {
     autoSubmit:false,
     minChars:1,
@@ -183,11 +184,19 @@ Autocomplete.prototype = {
       this.data = cr.data;
       this.suggest();
     } else if (!this.isBadQuery(this.currentValue)) {
-      new Ajax.Request(this.serviceUrl, {
-        parameters: { query: this.currentValue },
-        onComplete: this.processResponse.bind(this),
-        method: 'get'
-      });
+      var options = new Object();
+      options.parameters = new Object();
+      for (var property in this.parameters) {
+          if (this.parameters[property] instanceof Function) {
+              options.parameters[property] = this.parameters[property].call();
+          } else {
+              options.parameters[property] = this.parameters[property];
+          }
+      }
+      options.parameters.query = this.currentValue;
+      options.onComplete = this.processResponse.bind(this);
+      options.method = 'get';
+      new Ajax.Request(this.serviceUrl, options);
     } else {
         this.onNoResults(this.currentValue);
     }
