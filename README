@@ -93,4 +93,4 @@ Version 1.0
 * Adds method onKeypressed (when user types something in to the text box).
 * Doesn't allow submission (on Enter or TAB) if there are no results
  returned by the initial query.
-
+* Added parameters for initial Ajax Request.
