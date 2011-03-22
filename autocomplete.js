@@ -88,8 +88,13 @@ Autocomplete.prototype = {
     Event.observe(this.el, 'keyup', this.onKeyUp.bind(this));
     Event.observe(this.el, 'blur', this.enableKillerFn.bind(this));
     Event.observe(this.el, 'focus', this.fixPosition.bind(this));
+    Event.observe(this.el, 'select', this.textSelected.bind(this));
     this.container.setStyle({ maxHeight: this.options.maxHeight + 'px' });
     this.instanceId = Autocomplete.instances.push(this) - 1;
+  },
+
+  textSelected: function() {
+    this.selectedNow = true;
   },
 
   fixPosition: function() {
@@ -116,8 +121,16 @@ Autocomplete.prototype = {
 
   onKeyPress: function(e) {
     switch (e.keyCode) {
+      case Event.KEY_DELETE:
+        if (this.selectedNow) {
+          this.hide();
+          this.selectedNow = false;
+        }
+        this.onKeypressed(e);
+        return;
+        break;
       case Event.KEY_ESC:
-        this.el.value = this.currentValue;
+        this.updateValue(this.currentValue);
         this.hide();
         break;
       case Event.KEY_TAB:
@@ -272,7 +285,7 @@ Autocomplete.prototype = {
   select: function(i) {
     var selectedValue = this.suggestions[i];
     if (selectedValue) {
-      this.el.value = selectedValue;
+      this.updateValue(selectedValue);
       if (this.options.autoSubmit && this.el.form) {
         this.el.form.submit();
       }
@@ -287,7 +300,7 @@ Autocomplete.prototype = {
     if (this.selectedIndex === 0) {
       this.container.childNodes[0].className = '';
       this.selectedIndex = -1;
-      this.el.value = this.currentValue;
+      this.updateValue(this.currentValue);
       return;
     }
     this.adjustScroll(this.selectedIndex - 1);
@@ -309,7 +322,11 @@ Autocomplete.prototype = {
     } else if (offsetTop > lowerBound) {
       container.scrollTop = offsetTop - this.options.maxHeight + 25;
     }
-    this.el.value = this.suggestions[i];
+    this.updateValue(this.suggestions[i]);
+  },
+
+  updateValue: function(value) {
+    this.el.value = value.replace(/ *\(.*\)/, "");
   },
 
   onSelect: function(i) {
