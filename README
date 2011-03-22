@@ -98,3 +98,6 @@ Version 1.0
 * Doesn't allow submission (on Enter or TAB) if there are no results
  returned by the initial query.
 * Added parameters for initial Ajax Request.
+* Added ability to select text box and delete (and queries still work).
+* Suggestions can contain extra information in brackets e.g. 
+ "Javascript (language)" that will not show up in textbox.
