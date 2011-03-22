@@ -258,7 +258,7 @@ Autocomplete.prototype = {
     }
     this.selectedIndex = index;
     if (this.selectedIndex !== -1 && divs.length > this.selectedIndex) {
-      activeItem = divs[this.selectedIndex]
+      activeItem = divs[this.selectedIndex];
       activeItem.className = 'selected';
     }
     return activeItem;
