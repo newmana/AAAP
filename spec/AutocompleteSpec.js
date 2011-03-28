@@ -20,7 +20,7 @@ describe("autocomplete", function() {
     expect($('container')).toContain('div[title=peach]');
   }); 
   
-  it("selecting second suggestion", function() {
+  it("move down can go no further than maximum item", function() {
     auto.currentValue = 'a';
     auto.suggestions = ['banana', 'peach'];
     auto.data = [ 'fruit_1', 'fruit_2'];
