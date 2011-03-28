@@ -24,11 +24,19 @@ describe("autocomplete", function() {
       expect($('container')).toContain('div[title=peach]');
     }); 
   
-    it("move down can go no further than maximum item", function() {
+    it("move up at the top can go no further, and move down two then up", function() {
+      checkMoveUp(-1, "");
       checkMoveDown(0, "banana");
       checkMoveDown(1, "peach");
-      checkMoveDown(1, "peach");
+      checkMoveUp(0, "banana");
+      checkMoveUp(-1, "a");
     });
+
+    function checkMoveUp(expectedIndex, expectedValue) {    
+      auto.moveUp();
+      expect(auto.selectedIndex).toEqual(expectedIndex);
+      expect(auto.el.value).toEqual(expectedValue);
+    }
 
     function checkMoveDown(expectedIndex, expectedValue) {
       auto.moveDown();
