@@ -87,6 +87,9 @@ function doStuff() {
 This will send:
 /object?query=whateveryoutype&something=foo&func=resultOfDoStuff
 
+Testing
+=======
+This uses Jasmine, to run the specs load: SpecRunner.html into your browser.
 
 Changes
 =======
@@ -101,3 +104,4 @@ Version 1.0
 * Added ability to select text box and delete (and queries still work).
 * Suggestions can contain extra information in brackets e.g. 
  "Javascript (language)" that will not show up in textbox.
+* Added testing with Jasmine.
