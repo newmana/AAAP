@@ -11,8 +11,6 @@ describe("autocomplete", function() {
   });
 
   it("valid suggestions causes update to DOM", function() {
-    expect($('container')).toContain('#anonymous_element_1');;
-    expect($('container')).toContain('#anonymous_element_2');;
     auto.currentValue = 'a';
     auto.suggestions = ['banana', 'peach'];
     auto.data = [ 'fruit_1', 'fruit_2'];
@@ -21,4 +19,20 @@ describe("autocomplete", function() {
     expect($('container')).toContain('div[title=banana]');
     expect($('container')).toContain('div[title=peach]');
   }); 
+  
+  it("selecting second suggestion", function() {
+    auto.currentValue = 'a';
+    auto.suggestions = ['banana', 'peach'];
+    auto.data = [ 'fruit_1', 'fruit_2'];
+    auto.suggest();
+    checkMoveDown(0, "banana");
+    checkMoveDown(1, "peach");
+    checkMoveDown(1, "peach");
+  });
+  
+  function checkMoveDown(expectedIndex, expectedValue) {
+    auto.moveDown();
+    expect(auto.selectedIndex).toEqual(expectedIndex);
+    expect(auto.el.value).toEqual(expectedValue);
+  }
 });
