@@ -44,4 +44,24 @@ describe("autocomplete", function() {
       expect(auto.el.value).toEqual(expectedValue);
     }
   });
+  
+  describe("check select", function() {
+    beforeEach(function() {
+      auto.currentValue = 'a';
+      auto.suggestions = ['banana', 'peach'];
+      auto.data = [ 'fruit_1', 'fruit_2'];
+    });
+  
+    it("select within range", function() {
+      spyOn(auto, 'onSelect');
+      checkSelect(0, "banana");
+      checkSelect(1, "peach");
+    });
+    
+    function checkSelect(expectedIndex, expectedValue) {
+      auto.select(expectedIndex);
+      expect(auto.el.value).toEqual(expectedValue);
+      expect(auto.onSelect).toHaveBeenCalledWith(expectedIndex);
+    }
+  });
 });
