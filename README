@@ -96,6 +96,7 @@ Changes
 
 Version 1.0
 -----------
+* Fixes a bug when user click on the suggestion and then the user cannot search again. 
 * Adds method onNoResults (when the AJAX query returns no results).
 * Adds method onKeypressed (when user types something in to the text box).
 * Doesn't allow submission (on Enter or TAB) if there are no results

@@ -95,6 +95,7 @@ Autocomplete.prototype = {
 
   textSelected: function() {
     this.selectedNow = true;
+    this.onValueChange();
   },
 
   fixPosition: function() {
