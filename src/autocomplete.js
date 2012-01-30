@@ -61,7 +61,8 @@ Autocomplete.prototype = {
   initialize: function() {
     var me = this;
     this.killerFn = function(e) {
-      if (!$(Event.element(e)).up('.autocomplete')) {
+      var element = $(Event.element(e));
+      if (element !== undefined && !element.up('.autocomplete')) {
         me.killSuggestions();
         me.disableKillerFn();
       }
