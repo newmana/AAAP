@@ -31,7 +31,8 @@ var Autocomplete = function(el, options){
     maxHeight:300,
     deferRequestBy:0,
     width:0,
-    container:null
+    container:null,
+    autoHide:true
   };
   if(options){ Object.extend(this.options, options); }
   if(Autocomplete.isDomLoaded){
@@ -94,6 +95,9 @@ Autocomplete.prototype = {
         this.container.setStyle({ maxHeight: this.options.maxHeight + 'px' });
     }
     this.instanceId = Autocomplete.instances.push(this) - 1;
+    if (!this.options.autoHide) {
+        this.container.show();
+    }
   },
 
   textSelected: function() {
@@ -228,29 +232,32 @@ Autocomplete.prototype = {
   },
 
   hide: function() {
-    this.enabled = false;
-    this.selectedIndex = -1;
-    this.container.hide();
+    if (this.options.autoHide) {
+      this.enabled = false;
+      this.selectedIndex = -1;
+      this.container.hide();
+    }
   },
 
   suggest: function() {
     if (this.suggestions.length === 0) {
       this.hide();
-      return;
+    } else {
+      var content = [];
+      var re = new RegExp('\\b' + this.currentValue.match(/\w+/g).join('|\\b'), 'gi');
+      this.suggestions.each(function(value, i) {
+        var divClass = value[1] ? value[1] : "";
+        var startDiv = '<div class="' + divClass;
+        startDiv += this.selectedIndex === i ? ' selected"' : '"';
+        content.push(startDiv, ' title="', value[0], '" onclick="Autocomplete.instances[');
+        content.push(this.instanceId, '].select(', i, ');" onmouseover="Autocomplete.instances[');
+        content.push(this.instanceId, '].activate(', i, ');">', '<span class="type"></span>');
+        content.push(Autocomplete.highlight(value[0], re), '</div>');
+      } .bind(this));
+      this.enabled = true;
+      this.container.update(content.join('')).show();
     }
-    var content = [];
-    var re = new RegExp('\\b' + this.currentValue.match(/\w+/g).join('|\\b'), 'gi');
-    this.suggestions.each(function(value, i) {
-      var divClass = value[1] ? value[1] : "";
-      var startDiv = '<div class="' + divClass;
-      startDiv += this.selectedIndex === i ? ' selected"' : '"';
-      content.push(startDiv, ' title="', value[0], '" onclick="Autocomplete.instances[');
-      content.push(this.instanceId, '].select(', i, ');" onmouseover="Autocomplete.instances[');
-      content.push(this.instanceId, '].activate(', i, ');">', '<span class="type"></span>');
-      content.push(Autocomplete.highlight(value[0], re), '</div>');
-    } .bind(this));
-    this.enabled = true;
-    this.container.update(content.join('')).show();
+    this.onSuggestion(this.suggestions);
   },
 
   processResponse: function(xhr) {
@@ -344,11 +351,15 @@ Autocomplete.prototype = {
   },
 
   onNoResults: function(currentValue) {
-      (this.options.onNoResults || Prototype.emptyFunction)(currentValue);
+    (this.options.onNoResults || Prototype.emptyFunction)(currentValue);
   },
 
   onKeypressed: function(e) {
-      (this.options.onKeypressed || Prototype.emptyFunction)(e);
+    (this.options.onKeypressed || Prototype.emptyFunction)(e);
+  },
+
+  onSuggestion : function(suggestions) {
+    (this.options.onSuggestion || Prototype.emptyFunction)(this.suggestions);
   }
 };
 
