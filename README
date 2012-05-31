@@ -99,8 +99,8 @@ Changes
 
 Version 1.0.1
 -------------
-* Changed suggestions to be an array with an optional second element that adds a class
- to the divs in the drop down list.
+* Changed suggestions to be an array with an optional second element that
+ adds a class to the divs in the drop down list.
 
 Version 1.0
 -----------
