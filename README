@@ -61,7 +61,7 @@ Options when constructing Autocomplete:
 * onKeypressed - a function that is called when the user modified the text
  box.  Useful if you want to clear error messages.
 * maxHeight - the maximum number of pixels high that the drop down box will
- be.
+ be. -1 will prevent a maximum height from being set.
 * width - the number of pixels wide the drop down box will be.
 * autoSubmit - set to true to submit the value without requiring the user 
  to hit enter or TAB.
@@ -101,6 +101,7 @@ Version 1.0.1
 -------------
 * Changed suggestions to be an array with an optional second element that
  adds a class to the divs in the drop down list.
+* Disable maxHeight by settings it to -1.
 
 Version 1.0
 -----------
