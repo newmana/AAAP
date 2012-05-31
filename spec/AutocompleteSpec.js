@@ -13,7 +13,7 @@ describe("autocomplete", function() {
   describe("check suggest", function() {
     beforeEach(function() {
       auto.currentValue = 'a';
-      auto.suggestions = ['banana', 'peach'];
+      auto.suggestions = [['banana'], ['peach']];
       auto.data = [ 'fruit_1', 'fruit_2'];
       auto.suggest();
     });
@@ -48,7 +48,7 @@ describe("autocomplete", function() {
   describe("check select", function() {
     beforeEach(function() {
       auto.currentValue = 'a';
-      auto.suggestions = ['banana', 'peach'];
+      auto.suggestions = [['banana'], ['peach']];
       auto.data = [ 'fruit_1', 'fruit_2'];
     });
   

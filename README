@@ -36,16 +36,19 @@ request:
 
 The server responds to the GET request with the following JSON:
 {
-  query:'whateveryoutype',
-  suggestions: ['a', 'b', 'c'],
+  query:'whateveryoutyped',
+  suggestions: [['a', 'person'], ['b'], ['c']],
   data: ['A', 'B', 'C']
 }
 
 Query - the query that was requested.
-Suggestions - the results to display from the query (a, b, and c).
+Suggestions - an array with the results to display from the query as the
+ first element ('a', 'b', and 'c'). The second element being a class to add
+ to the div (e.g. 'a' will have a div class called 'person', 'b' and 'c'
+ will have none).
 Data (optional) - values that are not visible but can be used to refer to 
-the visible results - like an ID - used in callback function when the 
-result is selected.
+ the visible results - like an ID - used in callback function when the
+ result is selected.
 
 Options when constructing Autocomplete:
 * serverUrl - a URL to send the GET query to.
@@ -93,6 +96,11 @@ This uses Jasmine, to run the specs load: SpecRunner.html into your browser.
 
 Changes
 =======
+
+Version 1.0.1
+-------------
+* Changed suggestions to be an array with an optional second element that adds a class
+ to the divs in the drop down list.
 
 Version 1.0
 -----------
