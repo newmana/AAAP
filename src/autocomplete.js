@@ -14,6 +14,7 @@ var Autocomplete = function (el, options) {
     this.id = this.el.identify();
     this.el.setAttribute('autocomplete', 'off');
     this.suggestions = [];
+    this.suggestionList = [];
     this.data = [];
     this.badQueries = [];
     this.selectedIndex = -1;
@@ -276,6 +277,28 @@ Autocomplete.prototype = {
             this.container.update(content.join('')).show();
         }
         this.onSuggestion(this.suggestions);
+    },
+
+    createSuggestionList : function () {
+        var thisSuggestionList = this.suggestionList;
+        this.suggestions.each(function (value, index) {
+            thisSuggestionList.push(index);
+        });
+    },
+
+    getEntryIndex : function (index) {
+        return this.suggestionList.entries()[index];
+    },
+
+    getSelectedValue : function (index) {
+        return this.suggestions[this.getEntryIndex(index)];
+    },
+
+    removeSuggestion : function (index) {
+        var entryIndex = this.getEntryIndex(index);
+        var item = this.getSelectedValue(index);
+        delete this.suggestionList[index];
+        return [entryIndex, item];
     },
 
     processResponse : function (xhr) {

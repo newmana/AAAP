@@ -53,15 +53,37 @@ describe("autocomplete", function () {
             auto.currentValue = 'a';
             auto.suggestions = [
                 ['banana'],
-                ['peach']
+                ['peach'],
+                ['pear'],
+                ['grape']
             ];
-            auto.data = [ 'fruit_1', 'fruit_2'];
+            auto.data = [ 'fruit_1', 'fruit_2', 'fruit_3', 'fruit_4'];
+            auto.createSuggestionList();
         });
 
         it("select within range", function () {
             spyOn(auto, 'onSelect');
             checkSelect(0, "banana");
             checkSelect(1, "peach");
+            checkSelect(2, "pear");
+            checkSelect(3, "grape");
+        });
+
+        it("suggestion list generation", function() {
+            expect(auto.suggestionList).toEqual([0,1,2,3]);
+        });
+
+        it("suggestion list removal", function() {
+            expect(auto.getSelectedValue(1)).toEqual(['peach']);
+            auto.removeSuggestion(1);
+            expect(auto.suggestionList.entries()).toEqual([0,2,3]);
+            expect(auto.getSelectedValue(1)).toEqual(['pear']);
+        });
+
+        it("suggestion list remove and adding back", function() {
+            expect(auto.removeSuggestion(1)).toEqual([1, ['peach']]);
+            expect(auto.removeSuggestion(2)).toEqual([3, ['grape']]);
+            auto.addSuggestion(3, ['grape']);
         });
 
         function checkSelect(expectedIndex, expectedValue) {
