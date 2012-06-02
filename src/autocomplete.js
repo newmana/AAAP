@@ -264,7 +264,7 @@ Autocomplete.prototype = {
         } else {
             var content = [];
             var re = new RegExp('\\b' + this.currentValue.match(/\w+/g).join('|\\b'), 'gi');
-            this.suggestions.each(function (value, i) {
+            this.activeSuggestions().each(function (value, i) {
                 var divClass = value[1] ? value[1] : "";
                 var startDiv = '<div class="' + divClass;
                 startDiv += this.selectedIndex === i ? ' selected"' : '"';
@@ -286,6 +286,15 @@ Autocomplete.prototype = {
         });
     },
 
+    activeSuggestions : function() {
+        var activeSuggestions = [];
+        var auto = this;
+        this.suggestionList.entries().each(function (index, i) {
+            activeSuggestions.push(auto.suggestions[index]);
+        });
+        return activeSuggestions;
+    },
+
     getEntryIndex : function (index) {
         return this.suggestionList.entries()[index];
     },
@@ -297,8 +306,12 @@ Autocomplete.prototype = {
     removeSuggestion : function (index) {
         var entryIndex = this.getEntryIndex(index);
         var item = this.getSelectedValue(index);
-        delete this.suggestionList[index];
+        delete this.suggestionList[entryIndex];
         return [entryIndex, item];
+    },
+
+    addSuggestion : function (entryIndex) {
+        this.suggestionList[entryIndex] = entryIndex;
     },
 
     processResponse : function (xhr) {

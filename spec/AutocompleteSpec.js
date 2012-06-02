@@ -3,8 +3,8 @@ describe("autocomplete", function () {
     beforeEach(function () {
         setFixtures('<input type="text" name="wunderbar" id="query"/><div id="container"/>');
         auto = new Autocomplete("query", {
-            serviceUrl : "/object",
-            container : "container"
+            serviceUrl:"/object",
+            container:"container"
         });
         auto.isDomLoaded = true;
         auto.initialize();
@@ -13,11 +13,9 @@ describe("autocomplete", function () {
     describe("check suggest", function () {
         beforeEach(function () {
             auto.currentValue = 'a';
-            auto.suggestions = [
-                ['banana'],
-                ['peach']
-            ];
+            auto.suggestions = [ ['banana'], ['peach'] ];
             auto.data = [ 'fruit_1', 'fruit_2'];
+            auto.createSuggestionList();
             auto.suggest();
         });
 
@@ -51,12 +49,7 @@ describe("autocomplete", function () {
     describe("check select", function () {
         beforeEach(function () {
             auto.currentValue = 'a';
-            auto.suggestions = [
-                ['banana'],
-                ['peach'],
-                ['pear'],
-                ['grape']
-            ];
+            auto.suggestions = [ ['banana'], ['peach'], ['pear'], ['grape'] ];
             auto.data = [ 'fruit_1', 'fruit_2', 'fruit_3', 'fruit_4'];
             auto.createSuggestionList();
         });
@@ -69,21 +62,30 @@ describe("autocomplete", function () {
             checkSelect(3, "grape");
         });
 
-        it("suggestion list generation", function() {
-            expect(auto.suggestionList).toEqual([0,1,2,3]);
+        it("suggestion list generation", function () {
+            expect(auto.suggestionList).toEqual([0, 1, 2, 3]);
         });
 
-        it("suggestion list removal", function() {
+        it("suggestion list removal", function () {
             expect(auto.getSelectedValue(1)).toEqual(['peach']);
             auto.removeSuggestion(1);
-            expect(auto.suggestionList.entries()).toEqual([0,2,3]);
+            expect(auto.suggestionList.entries()).toEqual([0, 2, 3]);
             expect(auto.getSelectedValue(1)).toEqual(['pear']);
         });
 
-        it("suggestion list remove and adding back", function() {
+        it("suggestion list remove and adding back", function () {
             expect(auto.removeSuggestion(1)).toEqual([1, ['peach']]);
             expect(auto.removeSuggestion(2)).toEqual([3, ['grape']]);
-            auto.addSuggestion(3, ['grape']);
+            expect(auto.suggestionList.entries()).toEqual([0, 2]);
+            auto.addSuggestion(3);
+            expect(auto.suggestionList.entries()).toEqual([0, 2, 3]);
+        });
+
+        it("check values in suggestions list", function () {
+            expect(auto.activeSuggestions()).toEqual([ ['banana'], ['peach'], ['pear'], ['grape'] ]);
+            auto.removeSuggestion(2);
+            expect(auto.suggestionList.entries()).toEqual([0, 1, 3]);
+            expect(auto.activeSuggestions()).toEqual([ ['banana'], ['peach'], ['grape'] ]);
         });
 
         function checkSelect(expectedIndex, expectedValue) {
