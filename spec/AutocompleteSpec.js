@@ -13,8 +13,8 @@ describe("autocomplete", function () {
     describe("check suggest", function () {
         beforeEach(function () {
             auto.currentValue = 'a';
-            auto.suggestions = [ ['banana'], ['peach'] ];
-            auto.data = [ 'fruit_1', 'fruit_2'];
+            auto.suggestions = [ ['banana'], ['peach'], ['pear'], ['grape'] ];
+            auto.data = [ 'fruit_1', 'fruit_2', 'fruit_3', 'fruit_4'];
             auto.createSuggestionList();
             auto.suggest();
         });
@@ -29,6 +29,30 @@ describe("autocomplete", function () {
             checkMoveUp(-1, "");
             checkMoveDown(0, "banana");
             checkMoveDown(1, "peach");
+            checkMoveDown(2, "pear");
+            checkMoveDown(3, "grape");
+            checkMoveDown(3, "grape");
+            checkMoveUp(2, "pear");
+            checkMoveUp(1, "peach");
+            checkMoveUp(0, "banana");
+            checkMoveUp(-1, "a");
+        });
+
+        it("removal all but first, check move down", function () {
+            auto.removeSuggestion(1);
+            auto.removeSuggestion(1);
+            auto.removeSuggestion(1);
+            checkMoveDown(0, "banana");
+            checkMoveDown(0, "banana");
+        });
+
+        it("check moving with removal", function () {
+            checkMoveUp(-1, "");
+            checkMoveDown(0, "banana");
+            checkMoveDown(1, "peach");
+            checkMoveDown(2, "pear");
+            var suggestion = auto.removeSuggestion(1);
+            expect(suggestion[1]).toEqual(["peach"])
             checkMoveUp(0, "banana");
             checkMoveUp(-1, "a");
         });
@@ -69,6 +93,24 @@ describe("autocomplete", function () {
             checkSelect(1, "pear");
             auto.addSuggestion(suggestion[0]);
             checkSelect(1, "peach");
+        });
+
+        it("test onSelect", function() {
+            auto.options.onSelect = function(suggestion, data) {
+                expect(suggestion).toEqual("peach");
+                expect(data).toEqual("fruit_2");
+            };
+            auto.select(1);
+        });
+
+        it("test onSelect with remove", function() {
+            auto.options.onSelect = function(suggestion, data) {
+                expect(suggestion).toEqual("pear");
+                expect(data).toEqual("fruit_3");
+            };
+            auto.removeSuggestion(1);
+            auto.select(1);
+            expect(auto.selectedIndex).toEqual(-1);
         });
 
         it("suggestion list generation", function () {

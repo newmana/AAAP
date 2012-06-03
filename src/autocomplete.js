@@ -308,6 +308,9 @@ Autocomplete.prototype = {
         var entryIndex = this.getEntryIndex(index);
         var item = this.getSelectedValue(index);
         delete this.suggestionList[entryIndex];
+        if (this.selectedIndex > 0) {
+            this.selectedIndex--;
+        }
         return [entryIndex, item];
     },
 
@@ -387,7 +390,7 @@ Autocomplete.prototype = {
     },
 
     moveDown : function () {
-        if (this.selectedIndex === (this.suggestions.length - 1)) {
+        if (this.selectedIndex === (this.activeSuggestions().length - 1)) {
             return;
         }
         this.adjustScroll(this.selectedIndex + 1);
@@ -404,7 +407,7 @@ Autocomplete.prototype = {
         } else if (offsetTop > lowerBound) {
             container.scrollTop = offsetTop - this.options.maxHeight + 25;
         }
-        this.updateValue(this.suggestions[i][0]);
+        this.updateValue(this.getSelectedValue(i)[0]);
     },
 
     updateValue : function (value) {
@@ -412,7 +415,8 @@ Autocomplete.prototype = {
     },
 
     onSelect : function (i) {
-        (this.options.onSelect || Prototype.emptyFunction)(this.suggestions[i][0], this.data[i]);
+        index = this.getEntryIndex(i);
+        (this.options.onSelect || Prototype.emptyFunction)(this.suggestions[index][0], this.data[index]);
     },
 
     onNoResults : function (currentValue) {
