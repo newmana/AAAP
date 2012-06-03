@@ -25,6 +25,14 @@ describe("autocomplete", function () {
             expect($('container')).toContain('div[title=peach]');
         });
 
+        it("check that the length of the active suggestions equals the suggest list key size", function() {
+            expect(auto.activeSuggestions().length).toEqual(auto.suggestionList.entries().length);
+            var suggestion = auto.removeSuggestion(0);
+            expect(auto.activeSuggestions().length).toEqual(auto.suggestionList.entries().length);
+            auto.addSuggestion(suggestion[0]);
+            expect(auto.activeSuggestions().length).toEqual(auto.suggestionList.entries().length);
+        });
+
         it("move up at the top can go no further, and move down two then up", function () {
             checkMoveUp(-1, "");
             checkMoveDown(0, "banana");
@@ -96,7 +104,8 @@ describe("autocomplete", function () {
         });
 
         it("test onSelect", function() {
-            auto.options.onSelect = function(suggestion, data) {
+            auto.options.onSelect = function(index, suggestion, data) {
+                expect(index).toEqual(1);
                 expect(suggestion).toEqual("peach");
                 expect(data).toEqual("fruit_2");
             };
@@ -104,7 +113,8 @@ describe("autocomplete", function () {
         });
 
         it("test onSelect with remove", function() {
-            auto.options.onSelect = function(suggestion, data) {
+            auto.options.onSelect = function(index, suggestion, data) {
+                expect(index).toEqual(2);
                 expect(suggestion).toEqual("pear");
                 expect(data).toEqual("fruit_3");
             };

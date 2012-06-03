@@ -416,7 +416,7 @@ Autocomplete.prototype = {
 
     onSelect : function (i) {
         index = this.getEntryIndex(i);
-        (this.options.onSelect || Prototype.emptyFunction)(this.suggestions[index][0], this.data[index]);
+        (this.options.onSelect || Prototype.emptyFunction)(index, this.suggestions[index][0], this.data[index]);
     },
 
     onNoResults : function (currentValue) {
