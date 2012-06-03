@@ -86,7 +86,7 @@ describe("autocomplete", function () {
             checkSelect(3, "grape");
         });
 
-        it("select within range after removing", function() {
+        it("select within range after adding/removing", function() {
             spyOn(auto, 'onSelect');
             checkSelect(1, "peach");
             var suggestion = auto.removeSuggestion(1);
