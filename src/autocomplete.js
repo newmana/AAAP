@@ -220,6 +220,7 @@ Autocomplete.prototype = {
         if (cr && Object.isArray(cr.suggestions)) {
             this.suggestions = cr.suggestions;
             this.data = cr.data;
+            this.createSuggestionList();
             this.suggest();
         } else if (!this.isBadQuery(this.currentValue)) {
             var options = new Object();
@@ -360,7 +361,7 @@ Autocomplete.prototype = {
     },
 
     select : function (i) {
-        var selectedValue = this.suggestions[i][0];
+        var selectedValue = this.getSelectedValue(i)[0];
         if (selectedValue) {
             this.updateValue(selectedValue);
             if (this.options.autoSubmit && this.el.form) {

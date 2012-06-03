@@ -62,6 +62,15 @@ describe("autocomplete", function () {
             checkSelect(3, "grape");
         });
 
+        it("select within range after removing", function() {
+            spyOn(auto, 'onSelect');
+            checkSelect(1, "peach");
+            var suggestion = auto.removeSuggestion(1);
+            checkSelect(1, "pear");
+            auto.addSuggestion(suggestion[0]);
+            checkSelect(1, "peach");
+        });
+
         it("suggestion list generation", function () {
             expect(auto.suggestionList).toEqual([0, 1, 2, 3]);
         });
