@@ -108,6 +108,8 @@ Version 1.0.1
 * Disable maxHeight by settings it to -1.
 * Added callback for suggestions.
 * Added autoHide.
+* Added ability to add/remove entries dynamically and keep original suggested
+ order.
 
 Version 1.0
 -----------
