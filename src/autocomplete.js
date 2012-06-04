@@ -335,10 +335,15 @@ Autocomplete.prototype = {
             this.onNoResults(response.query);
         }
         if (response.query === this.currentValue) {
-            this.suggestions = response.suggestions;
-            this.data = response.data;
-            this.suggest();
+            this.setWithResponse(response);
         }
+    },
+
+    setWithResponse : function (response) {
+        this.suggestions = response.suggestions;
+        this.data = response.data;
+        this.createSuggestionList();
+        this.suggest();
     },
 
     activate : function (index) {
