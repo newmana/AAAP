@@ -13,12 +13,7 @@ var Autocomplete = function (el, options) {
     this.el = $(el);
     this.id = this.el.identify();
     this.el.setAttribute('autocomplete', 'off');
-    this.suggestions = [];
-    this.suggestionList = [];
-    this.data = [];
     this.badQueries = [];
-    this.selectedIndex = -1;
-    this.currentValue = this.el.value;
     this.intervalId = 0;
     this.cachedResponse = [];
     this.instanceId = null;
@@ -26,6 +21,8 @@ var Autocomplete = function (el, options) {
     this.ignoreValueChange = false;
     this.serviceUrl = options.serviceUrl;
     this.parameters = options.parameters;
+    this.currentValue = this.el.value;
+    this.list = new AutocompleteList();
     this.options = {
         autoSubmit : false,
         minChars : 1,
@@ -158,12 +155,12 @@ Autocomplete.prototype = {
                 break;
             case Event.KEY_TAB:
             case Event.KEY_RETURN:
-                if (this.selectedIndex === -1) {
+                if (this.list.atBeginning()) {
                     this.hide();
                     Event.stop(e);
                     return;
                 }
-                this.select(this.selectedIndex);
+                this.select(this.list.selectedIndex);
                 if (e.keyCode === Event.KEY_TAB) {
                     return;
                 }
@@ -203,7 +200,7 @@ Autocomplete.prototype = {
     onValueChange : function () {
         clearInterval(this.onChangeInterval);
         this.currentValue = this.el.value;
-        this.selectedIndex = -1;
+        this.list.selectedIndex = -1;
         if (this.ignoreValueChange) {
             this.ignoreValueChange = false;
             return;
@@ -218,9 +215,7 @@ Autocomplete.prototype = {
     getSuggestions : function () {
         var cr = this.cachedResponse[this.currentValue];
         if (cr && Object.isArray(cr.suggestions)) {
-            this.suggestions = cr.suggestions;
-            this.data = cr.data;
-            this.createSuggestionList();
+            this.list.setWithResponse(cr);
             this.suggest();
         } else if (!this.isBadQuery(this.currentValue)) {
             var options = new Object();
@@ -254,21 +249,22 @@ Autocomplete.prototype = {
     hide : function () {
         if (this.options.autoHide) {
             this.enabled = false;
-            this.selectedIndex = -1;
+            this.list = new AutocompleteList();
             this.container.hide();
         }
     },
 
     suggest : function () {
-        if (this.suggestions.length === 0) {
+        if (this.list.emptySuggestions()) {
             this.hide();
+            this.container.hide();
         } else {
             var content = [];
             var re = new RegExp('\\b' + this.currentValue.match(/\w+/g).join('|\\b'), 'gi');
-            this.activeSuggestions().each(function (value, i) {
+            this.list.activeSuggestions().each(function (value, i) {
                 var divClass = value[1] ? value[1] : "";
                 var startDiv = '<div class="' + divClass;
-                startDiv += this.selectedIndex === i ? ' selected"' : '"';
+                startDiv += this.list.isSelected(i) ? ' selected"' : '"';
                 content.push(startDiv, ' title="', value[0], '" onclick="Autocomplete.instances[');
                 content.push(this.instanceId, '].select(', i, ');" onmouseover="Autocomplete.instances[');
                 content.push(this.instanceId, '].activate(', i, ');">', '<span class="type"></span>');
@@ -277,45 +273,6 @@ Autocomplete.prototype = {
             this.enabled = true;
             this.container.update(content.join('')).show();
         }
-        this.onSuggestion(this.suggestions);
-    },
-
-    createSuggestionList : function () {
-        var thisSuggestionList = this.suggestionList;
-        this.suggestions.each(function (value, index) {
-            thisSuggestionList.push(index);
-        });
-    },
-
-    activeSuggestions : function() {
-        var activeSuggestions = [];
-        var auto = this;
-        this.suggestionList.entries().each(function (index, i) {
-            activeSuggestions.push(auto.suggestions[index]);
-        });
-        return activeSuggestions;
-    },
-
-    getEntryIndex : function (index) {
-        return this.suggestionList.entries()[index];
-    },
-
-    getSelectedValue : function (index) {
-        return this.suggestions[this.getEntryIndex(index)];
-    },
-
-    removeSuggestion : function (index) {
-        var entryIndex = this.getEntryIndex(index);
-        var item = this.getSelectedValue(index);
-        delete this.suggestionList[entryIndex];
-        if (this.selectedIndex > 0) {
-            this.selectedIndex--;
-        }
-        return [entryIndex, item];
-    },
-
-    addSuggestion : function (entryIndex) {
-        this.suggestionList[entryIndex] = entryIndex;
     },
 
     processResponse : function (xhr) {
@@ -335,27 +292,23 @@ Autocomplete.prototype = {
             this.onNoResults(response.query);
         }
         if (response.query === this.currentValue) {
-            this.setWithResponse(response);
+            this.list = new AutocompleteList();
+            this.list.setWithResponse(response);
+            this.suggest();
+            this.onSuggestion(response.suggestions);
         }
-    },
-
-    setWithResponse : function (response) {
-        this.suggestions = response.suggestions;
-        this.data = response.data;
-        this.createSuggestionList();
-        this.suggest();
     },
 
     activate : function (index) {
         var divs = this.container.childNodes;
         var activeItem;
         // Clear previous selection:
-        if (this.selectedIndex !== -1 && divs.length > this.selectedIndex) {
-            divs[this.selectedIndex].removeClassName('selected');
+        if (!this.list.atBeginning() && divs.length > this.list.selectedIndex) {
+            divs[this.list.selectedIndex].removeClassName('selected');
         }
-        this.selectedIndex = index;
-        if (this.selectedIndex !== -1 && divs.length > this.selectedIndex) {
-            activeItem = divs[this.selectedIndex];
+        this.list.selectedIndex = index;
+        if (!this.list.atBeginning() && divs.length > this.list.selectedIndex) {
+            activeItem = divs[this.list.selectedIndex];
             activeItem.addClassName('selected');
         }
         return activeItem;
@@ -363,42 +316,47 @@ Autocomplete.prototype = {
 
     deactivate : function (div, index) {
         div.className = '';
-        if (this.selectedIndex === index) {
-            this.selectedIndex = -1;
+        if (this.list.selectedIndex === index) {
+            this.list.selectedIndex = -1;
         }
     },
 
-    select : function (i) {
-        var selectedValue = this.getSelectedValue(i)[0];
+    select : function (index) {
+        var selectedIndexAndValue = this.list.getEntryIndex(index);
+        var selectedValue = selectedIndexAndValue[1][0];
         if (selectedValue) {
-            this.updateValue(selectedValue);
+            if (this.autoHide) {
+                this.updateValue(selectedValue);
+            } else {
+                this.updateValue(this.currentValue);
+            }
             if (this.options.autoSubmit && this.el.form) {
                 this.el.form.submit();
             }
             this.ignoreValueChange = true;
             this.hide();
-            this.onSelect(i);
+            this.onSelect(index, selectedIndexAndValue);
         }
     },
 
     moveUp : function () {
-        if (this.selectedIndex === -1) {
+        if (this.list.atBeginning()) {
             return;
         }
-        if (this.selectedIndex === 0) {
-            this.container.childNodes[0].className = '';
-            this.selectedIndex = -1;
+        if (this.list.selectedIndex === 0) {
+            this.container.childNodes[0].removeClassName('selected');
+            this.list.selectedIndex = -1;
             this.updateValue(this.currentValue);
             return;
         }
-        this.adjustScroll(this.selectedIndex - 1);
+        this.adjustScroll(this.list.selectedIndex - 1);
     },
 
     moveDown : function () {
-        if (this.selectedIndex === (this.activeSuggestions().length - 1)) {
+        if (this.list.atEnd()) {
             return;
         }
-        this.adjustScroll(this.selectedIndex + 1);
+        this.adjustScroll(this.list.selectedIndex + 1);
     },
 
     adjustScroll : function (i) {
@@ -412,16 +370,18 @@ Autocomplete.prototype = {
         } else if (offsetTop > lowerBound) {
             container.scrollTop = offsetTop - this.options.maxHeight + 25;
         }
-        this.updateValue(this.getSelectedValue(i)[0]);
+        this.updateValue(this.list.getSelectedValue()[0]);
     },
 
     updateValue : function (value) {
         this.el.value = value.replace(/ *\(.*\)/, "");
     },
 
-    onSelect : function (i) {
-        index = this.getEntryIndex(i);
-        (this.options.onSelect || Prototype.emptyFunction)(index, this.suggestions[index][0], this.data[index]);
+    onSelect : function (origIndex, selectedIndexAndValue) {
+        var selectedIndex = selectedIndexAndValue[0];
+        var selectedValue = selectedIndexAndValue[1];
+        var selectedData = this.list.data[selectedIndex];
+        (this.options.onSelect || Prototype.emptyFunction)(origIndex, selectedValue, selectedData);
     },
 
     onNoResults : function (currentValue) {
@@ -434,6 +394,75 @@ Autocomplete.prototype = {
 
     onSuggestion : function (suggestions) {
         (this.options.onSuggestion || Prototype.emptyFunction)(this.suggestions);
+    }
+};
+
+var AutocompleteList = function () {
+    this.selectedIndex = -1;
+    this.suggestions = [];
+    this.suggestionList = [];
+    this.data = [];
+};
+
+AutocompleteList.prototype = {
+    atBeginning : function() {
+        return this.selectedIndex === -1;
+    },
+
+    atEnd : function() {
+        return this.selectedIndex === this.suggestionList.entries().length - 1;
+    },
+
+    isSelected : function(index) {
+        return this.selectedIndex === index;
+    },
+
+    createSuggestionList : function () {
+        var thisSuggestionList = this.suggestionList;
+        this.suggestions.each(function (value, index) {
+            thisSuggestionList.push(index);
+        });
+    },
+
+    emptySuggestions : function() {
+        return this.suggestionList.entries().length === 0;
+    },
+
+    activeSuggestions : function() {
+        var activeSuggestions = [];
+        var auto = this;
+        this.suggestionList.entries().each(function (index, i) {
+            activeSuggestions.push(auto.suggestions[index]);
+        });
+        return activeSuggestions;
+    },
+
+    getEntryIndex : function (index) {
+        var indexToSuggestion = this.suggestionList.entries()[index];
+        return [indexToSuggestion, this.suggestions[indexToSuggestion]];
+    },
+
+    getSelectedValue : function () {
+        return this.getEntryIndex(this.selectedIndex)[1];
+    },
+
+    removeSuggestion : function (index) {
+        var entryIndex = this.getEntryIndex(index);
+        delete this.suggestionList[entryIndex[0]];
+        if (this.selectedIndex > 0) {
+            this.selectedIndex--;
+        }
+        return entryIndex;
+    },
+
+    addSuggestion : function (entryIndex) {
+        this.suggestionList[entryIndex] = entryIndex;
+    },
+
+    setWithResponse : function (response) {
+        this.suggestions = response.suggestions;
+        this.data = response.data;
+        this.createSuggestionList();
     }
 };
 
