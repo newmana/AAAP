@@ -249,7 +249,6 @@ Autocomplete.prototype = {
     hide : function () {
         if (this.options.autoHide) {
             this.enabled = false;
-            this.list = new AutocompleteList();
             this.container.hide();
         }
     },
